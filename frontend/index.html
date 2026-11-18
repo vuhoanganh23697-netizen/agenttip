@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgentTip.ai — Every Tip Tells a Story</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ═══ Header ═══ -->
+<header>
+  <div class="logo">
+    <div class="logo-mark">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <circle cx="14" cy="14" r="14" fill="url(#logoGrad)"/>
+        <path d="M9 14l3 3 7-7" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <defs><linearGradient id="logoGrad" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#f0b90b"/><stop offset="1" stop-color="#d4a20a"/></linearGradient></defs>
+      </svg>
+    </div>
+    <span>AgentTip<span class="logo-ai">.ai</span></span>
+  </div>
+  <nav class="nav-tabs" id="navTabs">
+    <button class="nav-tab active" data-view="universe">Universe</button>
+    <button class="nav-tab" data-view="tip">Tip</button>
+    <button class="nav-tab" data-view="stream">Stream</button>
+  </nav>
+  <button id="connectBtn" class="btn btn-connect">
+    <span class="btn-dot"></span>
+    Connect Wallet
+  </button>
+</header>
+
+<!-- ═══ Hero ═══ -->
+<section class="hero" id="heroSection">
+  <div class="hero-glow"></div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">THE REPUTATION LAYER FOR AI AGENTS</p>
+    <h1>Every Tip Tells<br>a <span class="gradient-text">Story</span></h1>
+    <p class="hero-sub">Discover, recognize and reward AI Agents on BNB Chain.<br>Each tip builds an on-chain reputation that lasts forever.</p>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <span class="hero-stat-val" id="statTips">0</span>
+        <span class="hero-stat-label">Tips Sent</span>
+      </div>
+      <div class="hero-stat-sep"></div>
+      <div class="hero-stat">
+        <span class="hero-stat-val" id="statVolume">0</span>
+        <span class="hero-stat-label">BNB Tipped</span>
+      </div>
+      <div class="hero-stat-sep"></div>
+      <div class="hero-stat">
+        <span class="hero-stat-val" id="statAgents">0</span>
+        <span class="hero-stat-label">Agents</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ View: Agent Universe ═══ -->
+<section class="view active" id="viewUniverse">
+  <div class="section-header">
+    <h2>Agent Universe</h2>
+    <p class="section-sub">Explore the constellation of AI Agents on BNB Chain</p>
+  </div>
+
+  <div class="agent-grid" id="agentGrid">
+    <!-- Populated by JS with mock data for demo -->
+  </div>
+</section>
+
+<!-- ═══ View: One-Click Tip ═══ -->
+<section class="view" id="viewTip">
+  <div class="section-header">
+    <h2>One-Click Tip</h2>
+    <p class="section-sub">Tip any Agent in 3 seconds — as easy as sending a message</p>
+  </div>
+
+  <div class="tip-flow">
+    <!-- Step indicator -->
+    <div class="tip-steps">
+      <div class="tip-step active" data-step="1"><span>1</span> Find</div>
+      <div class="tip-step-line"></div>
+      <div class="tip-step" data-step="2"><span>2</span> Amount</div>
+      <div class="tip-step-line"></div>
+      <div class="tip-step" data-step="3"><span>3</span> Send</div>
+    </div>
+
+    <!-- Agent ID check for sender -->
+    <div class="sender-status" id="senderStatus" style="display:none;">
+      <span class="agent-badge" id="agentBadge"></span>
+    </div>
+
+    <!-- Step 1: Find Agent -->
+    <div class="tip-panel active" id="tipStep1">
+      <div class="form-group">
+        <label>Recipient Agent ID</label>
+        <div class="input-wrap">
+          <div class="input-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          </div>
+          <input type="text" id="recipientInput" placeholder="Enter name.ai or paste address" autocomplete="off">
+          <button class="btn btn-resolve" id="resolveBtn">Resolve</button>
+        </div>
+        <div class="resolve-result" id="resolveResult"></div>
+      </div>
+    </div>
+
+    <!-- Step 2: Choose Amount -->
+    <div class="tip-panel" id="tipStep2">
+      <div class="resolved-agent" id="resolvedAgent" style="display:none;">
+        <div class="resolved-avatar" id="resolvedAvatar"></div>
+        <div class="resolved-info">
+          <div class="resolved-name" id="resolvedName"></div>
+          <div class="resolved-addr" id="resolvedAddr"></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Tip Amount</label>
+        <div class="amount-grid">
+          <button class="amount-chip" data-amount="0.001">
+            <span class="chip-val">0.001</span>
+            <span class="chip-label">BNB</span>
+          </button>
+          <button class="amount-chip" data-amount="0.005">
+            <span class="chip-val">0.005</span>
+            <span class="chip-label">BNB</span>
+          </button>
+          <button class="amount-chip selected" data-amount="0.01">
+            <span class="chip-val">0.01</span>
+            <span class="chip-label">BNB</span>
+          </button>
+          <button class="amount-chip" data-amount="0.05">
+            <span class="chip-val">0.05</span>
+            <span class="chip-label">BNB</span>
+          </button>
+        </div>
+        <div class="custom-amount">
+          <input type="number" id="amountInput" placeholder="Or enter custom amount" step="0.001" min="0.0001">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Message <span class="optional">(on-chain, forever)</span></label>
+        <input type="text" id="messageInput" placeholder="Great work! Keep building..." maxlength="200">
+        <div class="char-count"><span id="charCount">0</span>/200</div>
+      </div>
+    </div>
+
+    <!-- Tip button -->
+    <button class="btn btn-tip" id="tipBtn" disabled>
+      <span id="tipBtnText">Connect wallet to start</span>
+      <svg class="btn-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+</section>
+
+<!-- ═══ View: Tip Stream ═══ -->
+<section class="view" id="viewStream">
+  <div class="section-header">
+    <h2>Live Tip Stream</h2>
+    <p class="section-sub">Real-time on-chain activity — proof of community recognition</p>
+  </div>
+
+  <div class="stream-list" id="streamList">
+    <p class="empty-state">Loading on-chain activity...</p>
+  </div>
+</section>
+
+<!-- ═══ Agent Passport Modal ═══ -->
+<div class="modal-overlay" id="passportModal">
+  <div class="modal-content passport">
+    <button class="modal-close" id="modalClose">&times;</button>
+
+    <div class="passport-header">
+      <div class="passport-avatar" id="passportAvatar"></div>
+      <div class="passport-identity">
+        <h3 id="passportName"></h3>
+        <div class="passport-id" id="passportId"></div>
+        <div class="passport-domain" id="passportDomain"></div>
+      </div>
+    </div>
+
+    <div class="passport-stats">
+      <div class="passport-stat">
+        <span class="ps-val" id="psTips">0</span>
+        <span class="ps-label">Tips Received</span>
+      </div>
+      <div class="passport-stat">
+        <span class="ps-val" id="psVolume">0</span>
+        <span class="ps-label">BNB Earned</span>
+      </div>
+      <div class="passport-stat">
+        <span class="ps-val" id="psSupporters">0</span>
+        <span class="ps-label">Supporters</span>
+      </div>
+    </div>
+
+    <div class="passport-rep">
+      <div class="rep-bar-label">
+        <span>Reputation Score</span>
+        <span class="rep-score" id="repScore">0</span>
+      </div>
+      <div class="rep-bar-track">
+        <div class="rep-bar-fill" id="repBarFill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="passport-history">
+      <h4>Recent Recognition</h4>
+      <div class="passport-tips" id="passportTips"></div>
+    </div>
+
+    <button class="btn btn-tip passport-tip-btn" id="passportTipBtn">
+      <span>Tip this Agent</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ═══ Footer ═══ -->
+<footer>
+  <div class="footer-brand">
+    <span class="footer-tagline">Every Tip Tells a Story</span>
+    <span class="footer-sep">·</span>
+    <span>Built for the <a href="https://www.binance.com/en/support/announcement" target="_blank">Binance Agent ID Hackathon</a></span>
+  </div>
+  <div class="footer-links">
+    <a href="https://github.com/user/agenttip" target="_blank">GitHub</a>
+    <span class="footer-sep">·</span>
+    <a href="https://bscscan.com/address/0xaAFffe2b1126A74708AC4C4382e86832b8E00D4A" target="_blank" id="contractLink">Contract</a>
+    <span class="footer-sep">·</span>
+    <a href="https://id.binance.com" target="_blank">Get Agent ID</a>
+  </div>
+</footer>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
