@@ -472,36 +472,48 @@ function showResolve(html, cls) {
 }
 
 async function resolveAgentName(name) {
+  // If user pasted a raw address, return it directly
+  if (name.startsWith('0x') && name.length === 42) return name;
+
   const domain = name.endsWith('.ai') ? name : name + '.ai';
+  // Strip .ai suffix for v1 API (tld param already specifies it)
+  const baseName = domain.replace(/\.ai$/, '');
 
   // Tier 1: SPACE ID REST v1
   try {
-    const url = `${CONFIG.spaceIdResolve}?tld=ai&domain=${encodeURIComponent(domain)}`;
+    const url = `${CONFIG.spaceIdResolve}?tld=ai&domain=${encodeURIComponent(baseName)}`;
+    console.log('[Resolve] v1:', url);
     const resp = await fetch(url);
     if (resp.ok) {
       const data = await resp.json();
-      if (data.code === 0 && data.address) return data.address;
+      console.log('[Resolve] v1 response:', data);
+      if (data.code === 0 && data.address && data.address !== ethers.ZeroAddress) return data.address;
     }
-  } catch (_) {}
+  } catch (e) { console.warn('[Resolve] v1 failed:', e); }
 
   // Tier 2: SPACE ID REST v2
   try {
     const url = `https://api.prd.space.id/v2/resolve/name?name=${encodeURIComponent(domain)}`;
+    console.log('[Resolve] v2:', url);
     const resp = await fetch(url);
     if (resp.ok) {
       const data = await resp.json();
-      if (data.data?.resolvedAddress || data.data?.address) return data.data.resolvedAddress || data.data.address;
+      console.log('[Resolve] v2 response:', data);
+      const addr = data.data?.resolvedAddress || data.data?.address;
+      if (addr && addr !== ethers.ZeroAddress) return addr;
     }
-  } catch (_) {}
+  } catch (e) { console.warn('[Resolve] v2 failed:', e); }
 
   // Tier 3: On-chain resolver
   try {
+    console.log('[Resolve] on-chain for:', domain);
     const rp = new ethers.JsonRpcProvider(CONFIG.rpcUrl);
     const RESOLVER_ABI = ['function addr(bytes32 node) view returns (address)'];
     const resolver = new ethers.Contract('0x2D64eb25B05168f3cDB199c8e7392543D3e6B01f', RESOLVER_ABI, rp);
     const addr = await resolver.addr(ethers.namehash(domain));
+    console.log('[Resolve] on-chain result:', addr);
     if (addr && addr !== ethers.ZeroAddress) return addr;
-  } catch (_) {}
+  } catch (e) { console.warn('[Resolve] on-chain failed:', e); }
 
   return null;
 }
